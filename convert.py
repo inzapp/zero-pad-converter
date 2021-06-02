@@ -1,11 +1,21 @@
 import numpy as np
+import cv2
+import os
 
-from cv2 import cv2
 from glob import glob
 from tqdm import tqdm
 
 
 paths = glob('*.jpg')
+
+all_label_exists = True
+for path in paths:
+    label_path = f'{path[:-4]}.txt'
+    if not (os.path.exists(label_path) and os.path.isfile(label_path)):
+        print(f'label not exists : {label_path}')
+        all_label_exists = False
+if not all_label_exists:
+    exit(0)
 
 for path in tqdm(paths):
     img = cv2.imread(path, cv2.IMREAD_COLOR)
@@ -26,6 +36,7 @@ for path in tqdm(paths):
         pad = int((raw_width - raw_height) / 2)
         img = cv2.copyMakeBorder(img, pad, pad, 0, 0, cv2.BORDER_CONSTANT, (0, 0, 0))
 
+    print(path)
     label_path = f'{path[:-4]}.txt'
     with open(label_path, 'rt') as f:
         lines = f.readlines()
